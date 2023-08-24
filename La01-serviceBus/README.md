@@ -4,7 +4,7 @@
 
 ## Shorcots visualStudio
 1. Wrap word : Ctrl+E, Ctrl+W
-2. double tab : insert namespace with braces
+2. double tab : Auto Compiling
 
 ---
 
