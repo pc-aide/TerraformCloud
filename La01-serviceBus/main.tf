@@ -10,6 +10,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg_name" {
-  name     = var.rg_name
+  name     = var.rgName
   location = var.location
 }
