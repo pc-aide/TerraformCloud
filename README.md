@@ -16,7 +16,7 @@
 
 ---
 
-This documentation provides a detailed guide on deploying an Azure infrastructure using Terraform Cloud and explores the use of the C# programming language to interact with the Azure Service Bus.
+This documentation provides a detailed guide on deploying an Azure infrastructure using Terraform Cloud and explores the use of the C# programming language
 
 Contents:
 
