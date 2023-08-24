@@ -21,11 +21,15 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-ResourceGroup"
+  name     = var.rg_name
   location = "Central India"
 }
 
 # Declared in TerraformCloud
+variable "rg_name" {
+  type = string
+}
+
 variable "client_id" {
   type = string
 }
