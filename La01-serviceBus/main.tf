@@ -1,89 +1,76 @@
-# Configure Azure Provider
+########################################################
+# TERRAFORM
+########################################################
+
 terraform {
+  required_version = "~>1.5.0"
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
-      version = ">= 3.59.0"
-    } 
+      source  = "hashicorp/azurerm"
+      version = "~>3.19.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~>3.5.0"
+    }
   }
-  required_version = ">= 0.14.9"
 }
+
+########################################################
+# PROVIDERS
+########################################################
 
 provider "azurerm" {
   features {}
-
-  skip_provider_registration = "true"
-  
-  # Connection to Azure
-  subscription_id = var.subscription_id
-  client_id = var.client_id
-  client_secret = var.client_secret
-  tenant_id = var.tenant_id
+  skip_provider_registration = true
 }
 
-variable "prefix" {
-  default = "terraform"
+provider "random" {
+  # Configuration options
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.prefix}-ResourceGroup"
-  location = "Central India"
+########################################################
+# DATA
+########################################################
+
+resource "random_integer" "sbn_name_suffix" {
+  min = 1000
+  max = 9999
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.prefix}-VNet"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+########################################################
+# RESOURCE_GROUP
+########################################################
+
+resource "azurerm_resource_group" "rg_name" {
+  name     = var.rg_name
+  location = var.location
 }
 
-resource "azurerm_subnet" "internal" {
-  name                 = "${var.prefix}-internal"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.2.0/24"]
+########################################################
+# SERVICEBUS_NAMESPACE
+########################################################
+
+resource "azurerm_servicebus_namespace" "sbn-lab01" {
+  name                = "${var.sbn_name}${random_integer.sbn_name_suffix.result}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg_name.name
+  sku                 = var.sbn_sku
 }
 
-resource "azurerm_network_interface" "nic" {
-  name                = "${var.prefix}-NIC"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  ip_configuration {
-    name                          = "tfconfiguration1"
-    subnet_id                     = azurerm_subnet.internal.id
-    private_ip_address_allocation = "Dynamic"
-  }
+resource "azurerm_servicebus_queue" "sbn_queue" {
+  name         = var.sbn_queue_name
+  namespace_id = azurerm_servicebus_namespace.sbn-lab01.id
 }
 
-resource "azurerm_virtual_machine" "vm" {
-  name                  = "${var.prefix}-vm"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic.id]
-  vm_size               = "Standard_D1_v2"
+// SAS Policy for queue name
+resource "azurerm_servicebus_queue_authorization_rule" "sbn_queue_auth_rul" {
+  name     = var.sbn_queue_auth_rul_name
+  queue_id = azurerm_servicebus_queue.sbn_queue.id
 
-  storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
-  storage_os_disk {
-    name              = "myosdisk1"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-  os_profile {
-    computer_name  = "hostname"
-    admin_username = "tfadmin"
-    admin_password = "Password1234!"
-  }
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
-  tags = {
-    environment = "staging"
-  }
+  send = true
 }
+
+########################################################
+# OUTPUT
+########################################################
