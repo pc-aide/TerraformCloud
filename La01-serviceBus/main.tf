@@ -1,15 +1,26 @@
-provider "azurerm" {
-  version = "<=2.0.0"
-
-  subscription_id = var.subscriptionID
-  client_id       = var.clientID
-  client_secret   = var.clientSecret
-  tenant_id       = var.tenantID
-
-  features {}
+terraform {
+  required_providers {
+     azurerm = {
+      source = "hashicorp/azurerm"
+      version = ">= 3.59.0"
+    } 
+  }
+  required_version = ">= 0.14.9"
 }
 
-resource "azurerm_resource_group" "rg_name" {
-  name     = var.rgName
-  location = var.location
+provider "azurerm" {
+  features {}
+
+  skip_provider_registration = "true"
+
+  # Connection to Azure
+  subscription_id = var.subscription_id
+  client_id = var.client_id
+  client_secret = var.client_secret
+  tenant_id = var.tenant_id
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.prefix}-ResourceGroup"
+  location = "Central India"
 }
