@@ -28,22 +28,35 @@
 
 ---
 
-This documentation provides a detailed guide on deploying an Azure infrastructure using Terraform Cloud and explores the use of the C# programming language to interact with the Azure Service Bus.
+### Program.cs
+````cs
+// Import the namespace for interacting with Azure Service Bus
 
-Contents:
+// Namespace for the Service Bus Console application
 
-1. Azure Deployment through Terraform Cloud:
-   - Prerequisites and Terraform environment setup
-   - Creating and managing a Terraform configuration for Azure
-   - Deploying Azure resources using Terraform Cloud
-   - Managing updates and resource deletion
+    // internal class program
 
-2. C# Study with Service Bus:
-   - Introduction to Azure Service Bus and its features
-   - Configuring and creating a Service Bus in Azure
-   - Using C# to send and receive messages via Service Bus
-   - Exploring advanced features of Service Bus with C#
+        // variables : connection string & queueName from the SAS policy
 
-This lab serves as a practical introduction to managing Azure infrastructures through Terraform Cloud, while utilizing the C# programming language to interact with the Azure Service Bus. Detailed instructions and code examples are provided throughout this guide.
+        // service bus client instance (connectionString)
 
-Feel free to contribute, ask questions, or share suggestions to enhance this lab. Happy deployment and programming with Azure and Terraform Cloud!
+        // sender instance using the service bus for the queue
+
+        // method is where the program execution begins
+
+            // Create a message batch instance (class) using the Sender
+
+            // add 10 messages to the message Batch
+
+                // try to add a message to the batch with string : Message <number>
+
+                    // if it's too large for batch, show this message "The message <n> is too large to fit in the batch"
+
+            // use the serviceBusSender client to send the batch of messages to the service bus queue
+            
+            // write in the console : A batch of 10 messages has been published to the queue
+
+            // show in the console
+
+            // closing the connections & network resource
+````
